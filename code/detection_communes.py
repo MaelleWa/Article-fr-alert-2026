@@ -4,8 +4,9 @@ from pathlib import Path
 import pandas as pd
 import spacy
 
-communes_csv = Path("C:/Users/Maell/Documents/fr_alert/these/data/communes_sans_doublon.csv")
-communes_ambigues_csv = Path("C:/Users/Maell/Documents/fr_alert/these/data/communes_ambigues.csv")
+script_dir = Path(__file__).resolve().parent
+communes_csv = script_dir.parent / "data" / "communes_sans_doublon.csv"
+communes_ambigues_csv = script_dir.parent / "data" / "communes_ambigues.csv"
 seuil_heuristic = 1.5
 
 prep_lieu = {"à", "au", "aux", "dans", "vers", "près"}
@@ -202,7 +203,7 @@ debug_rows = []
 if __name__ == "__main__":
     nlp = build_pipeline(communes_list)
 
-    fichier_source = Path("C:/Users/Maell/Documents/fr_alert/these/data/messages_fr_alert.xlsx")
+    fichier_source = script_dir.parent / "data" / "messages_fr_alert.xlsx"
     df = pd.read_excel(fichier_source)
 
     has_commune_col = []
@@ -242,10 +243,10 @@ if __name__ == "__main__":
     df_debug = df_debug[df_debug["Nb_communes"] > 0]
     df = df[(df["Has_Commune"] == 1) | (df["Has_Emprise"] == 1)]
 
-    debug_path = Path("C:/Users/Maell/Documents/fr_alert/these/recap_alertes/debug_communes.xlsx")
+    debug_path = script_dir.parent / "recap_alertes" / "debug_communes.xlsx"
     df_debug.to_excel(debug_path, index=False)
 
-    fichier_destination = Path("C:/Users/Maell/Documents/fr_alert/these/recap_alertes/alertes_reelles_communes.xlsx")
+    fichier_destination = script_dir.parent / "recap_alertes" / "alertes_reelles_communes.xlsx"
     df.to_excel(fichier_destination, index=False)
 
     print(f" DEBUG FILTRÉ : {debug_path}")

@@ -1,9 +1,11 @@
 import pandas as pd
 from pathlib import Path
 
+script_dir = Path(__file__).resolve().parent
+
 #lecture du fichier xls
-df_main = pd.read_excel(Path(r"C:\Users\Maell\Documents\fr_alert\these\data\scores_compliance_main.xlsx"))
-df_code = pd.read_excel(Path(r"C:\Users\Maell\Documents\fr_alert\these\data\scores_compliance_code.xlsx"))
+df_main = pd.read_excel(script_dir.parent / "data" / "scores_compliance_main.xlsx")
+df_code = pd.read_excel(script_dir.parent / "data" / "scores_compliance_code.xlsx")
 
 
 colonnes = [i for i in range(1, 25)]
@@ -46,4 +48,4 @@ for col in colonnes:
 if "ID" in df_main.columns:
     df_comparaison.insert(0, "ID", df_main["ID"])
 
-df_comparaison.to_excel(Path(r"C:\Users\Maell\Documents\fr_alert\these\data\matrice_confusion.xlsx"), index=False)
+df_comparaison.to_excel(script_dir.parent / "data" / "matrice_confusion.xlsx", index=False)

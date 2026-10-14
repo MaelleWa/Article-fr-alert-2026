@@ -2,6 +2,7 @@ import pandas as pd
 from pathlib import Path
 
 #mots clés consignes
+script_dir = Path(__file__).resolve().parent
 
 keywords_map = {
     "Abritez-vous dans un bâtiment, en dur / fermé ; Confinez-vous . Regagnez un bâtiment": 
@@ -193,7 +194,7 @@ def verifier_ligne(row):
 # execution
 
 # chargement des données 
-input_file = Path("C:/Users/Maell/Documents/fr_alert/these/data/messages_fr_alert.xlsx")
+input_file = script_dir.parent / "data" / "messages_fr_alert.xlsx"
 df = pd.read_excel(input_file)
 
 df_analyse = df.apply(verifier_ligne, axis=1)
@@ -202,16 +203,16 @@ df_final = pd.concat([df, df_analyse], axis=1)
 
 # export final 
 
-output_file = Path("C:/Users/Maell/Documents/fr_alert/these/recap_alertes/analyse_consignes.xlsx")
+output_file = script_dir.parent / "recap_alertes" / "analyse_consignes.xlsx"
 df_final.to_excel(output_file, index=False)
 
 if __name__ == "__main__":
-    input_file = Path("C:/Users/Maell/Documents/fr_alert/these/data/messages_fr_alert.xlsx")
+    input_file = script_dir.parent / "data" / "messages_fr_alert.xlsx"
     df = pd.read_excel(input_file)
     
     df_analyse = df.apply(verifier_ligne, axis=1)
     df_final = pd.concat([df, df_analyse], axis=1)
     
-    output_file = Path("C:/Users/Maell/Documents/fr_alert/these/recap_alertes/analyse_consignes.xlsx")
+    output_file = script_dir.parent / "recap_alertes" / "analyse_consignes.xlsx"
     df_final.to_excel(output_file, index=False)
     print("Exécution standalone terminée.")

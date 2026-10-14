@@ -9,7 +9,9 @@ from detection_communes import build_pipeline, detect_commune_for_invariant
 
 nlp = spacy.load("fr_core_news_lg")
 
-communes_csv = Path("C:/Users/Maell/Documents/fr_alert/these/data/communes_sans_doublon.csv")
+script_dir = Path(__file__).resolve().parent
+
+communes_csv = script_dir.parent / "data" / "communes_sans_doublon.csv"
 df_communes = pd.read_csv(communes_csv)
 communes = df_communes["commune"].dropna().astype(str).tolist()
 nlp_communes = build_pipeline(communes)
@@ -207,7 +209,7 @@ def detect_site(text):
         return 1, match.group(0).strip()
 
     # Fleuves / rivières
-    fleuves_csv = Path("C:/Users/Maell/Documents/fr_alert/these/data/fleuves_rivieres.csv")
+    fleuves_csv = script_dir.parent / "data" / "fleuves_rivieres.csv"
     df_fleuves = pd.read_csv(fleuves_csv, encoding='iso-8859-1')
     noms_fleuves = df_fleuves["nom"].dropna().astype(str).tolist()
     mc_eau = ["crue","hauteurs d'eau", "hauteur d'eau", "hauteurs d’eau", "hauteur d’eau", "inondation rapide"]
@@ -375,11 +377,11 @@ invariants = {
 }
 
 
-input_file = Path("C:/Users/Maell/Documents/fr_alert/these/data/messages_fr_alert.xlsx")
-#input_file = Path("C:/Users/Maell/Documents/fr_alert/these/data/exercice_txt_reduit.xlsx")
+input_file = script_dir.parent / "data" / "messages_fr_alert.xlsx"
+#input_file = script_dir.parent / "data" / "exercice_txt_reduit.xlsx"
 
-output_file = Path("C:/Users/Maell/Documents/fr_alert/these/recap_alertes/analyse_alertes_vdef.xlsx")
-#output_file = Path("C:/Users/Maell/Documents/fr_alert/these/recap_alertes/analyse_alertes_exercice.xlsx")
+output_file = script_dir.parent / "recap_alertes" / "analyse_alertes_vdef.xlsx"
+#output_file = script_dir.parent / "recap_alertes" / "analyse_alertes_exercice.xlsx"
 
 df = pd.read_excel(input_file)
 colonne_texte = "Description"
