@@ -2,17 +2,16 @@ import pandas as pd
 from pathlib import Path
 
 #mots clés consignes
-script_dir = Path(__file__).resolve().parent
 
 keywords_map = {
     "Abritez-vous dans un bâtiment, en dur / fermé ; Confinez-vous . Regagnez un bâtiment": 
-        ["abritez-vous", "abritez vous", "confinez-vous", "confinez vous", "regagnez un bâtiment", "abri" ,"confin"],
+        ["abritez-vous", "abritez vous", "confinez-vous", "confinez vous", "regagnez un bâtiment"],
     
     "Abritez vous en hauteur (réfugiez vous le plus haut possible) / évacuez": 
-        ["abritez vous en hauteur", "réfugiez vous en hauteur", "réfugiez vous","réfugiez-vous", "évacuez","abri", "évac" , "evac" ],
+        ["abritez vous en hauteur", "réfugiez vous en hauteur", "réfugiez vous","réfugiez-vous", "évacuez" ],
     
     "Fermez portes et fenêtres (+ volets si besoin)": 
-        ["fermez vos portes", "fermez vos fenêtres", "fermez les portes", "fermez les fenêtres", "fermez fenêtres", "fermez portes", "fermez volets", "fermez les volets"],
+        ["fermez vos portes", "fermez vos fenêtres", "fermez les portes", "fermez les fenêtres", "fermez les volets"],
     
     "Evitez la zone / Eloignez-vous des fonds de vallée": 
         ["évitez la zone", "éloignez-vous", "évacuez", "évacuer", "éloignez vous", "evitez la zone", "eloignez vous"],
@@ -21,7 +20,7 @@ keywords_map = {
         ["reportez vos déplacements", "annulez vos déplacements", "évitez toute activité extérieure", "evitez toute activité extérieure"],
     
     "Coupez eau, gaz ou électricité / la ventilation": 
-        ["coupez l'eau", "coupez le gaz", "coupez l'électricité", "coupez la ventilation", "coupez eau", "coupez gaz", "coupez électricité", "coupez ventilation", "arrêtez l'eau", "arrêtez le gaz", "arrêtez l'électricité", "arrêtez la ventilation", "arrêtez eau", "arrêtez gaz", "arrêtez électricité", "arrêtez ventilation"],
+        ["coupez l'eau", "coupez le gaz", "coupez l'électricité", "coupez la ventilation", "arrêtez l'eau", "arrêtez le gaz", "arrêtez l'électricité", "arrêtez la ventilation",],
 
     "Autres consignes en plus (Munissez-vous d'équipements spéciaux (neige) ; Enfants (inondations) ; Consommation (pollution)": 
         ["équipements", "pneus", "chaînes", "école", "eau potable", "consommer"],
@@ -177,24 +176,32 @@ consignes_globales = [
 ]
 
 def verifier_ligne(row):
-# récupération et mise en minuscule des données d'entrée
+    # récupération et mise en minuscule des données d'entrée
     danger_actuel = str(row['Nature du danger']).lower().strip()
     message_text = str(row['Description']).lower()
+    
     # on récupère les consignes attendues pour ce danger (liste vide si non trouvé)
     attendues = referentiel_danger.get(danger_actuel, [])
+    
     resultat = {}
+    
     for consigne_nom, mots_cles in keywords_map.items():
         if consigne_nom not in attendues:
             resultat[consigne_nom] = "x"
         else:
             trouve = any(mot in message_text for mot in mots_cles)
-            resultat[consigne_nom] = 1 if trouve else 0
+            if consigne_nom == "Autres consignes en plus (Munissez-vous d'équipements spéciaux (neige) ; Enfants (inondations) ; Consommation (pollution)" and not trouve:
+                resultat[consigne_nom] = 1 if trouve else "x"
+            else:
+                resultat[consigne_nom] = 1 if trouve else 0
+
+                
     return pd.Series(resultat)
 
 # execution
 
 # chargement des données 
-input_file = script_dir.parent / "data" / "messages_fr_alert.xlsx"
+input_file = Path("C:/Users/Maell/Documents/fr_alert/these/data/resultats_scrap.xlsx")
 df = pd.read_excel(input_file)
 
 df_analyse = df.apply(verifier_ligne, axis=1)
@@ -203,16 +210,5 @@ df_final = pd.concat([df, df_analyse], axis=1)
 
 # export final 
 
-output_file = script_dir.parent / "recap_alertes" / "analyse_consignes.xlsx"
+output_file = Path("C:/Users/Maell/Documents/fr_alert/these/recap_alertes/analyse_consignes.xlsx")
 df_final.to_excel(output_file, index=False)
-
-if __name__ == "__main__":
-    input_file = script_dir.parent / "data" / "messages_fr_alert.xlsx"
-    df = pd.read_excel(input_file)
-    
-    df_analyse = df.apply(verifier_ligne, axis=1)
-    df_final = pd.concat([df, df_analyse], axis=1)
-    
-    output_file = script_dir.parent / "recap_alertes" / "analyse_consignes.xlsx"
-    df_final.to_excel(output_file, index=False)
-    print("Exécution standalone terminée.")
